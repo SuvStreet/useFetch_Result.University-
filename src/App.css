@@ -1,0 +1,23 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.card {
+  border: 1px solid #686868;
+  border-radius: 4px;
+  padding: 0.5em;
+  margin: 1em;
+}
+
+.loading {
+  padding: 2em;
+}
+
+.error {
+  font-weight: 600;
+  color: red;
+  padding: 2em;
+}

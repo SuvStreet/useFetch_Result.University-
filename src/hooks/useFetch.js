@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export function useFetch(url) {
   const [data, setData] = useState(null)
@@ -14,30 +14,29 @@ export function useFetch(url) {
     }
   }, [])
 
-  async function fetchData(params = '') {
-    try {
-      const response = await fetch(
-        params ? `${url}?_limit=${params._limit}` : url
-      )
-      const data = await response.json()
-      setIsLoading(false)
-      setData(data)
-    } catch (error) {
-      setIsLoading(false)
-      setError(error)
-    }
-  }
-
-  function refetch({ params }) {
-    setError(null)
-    setIsLoading(true)
-    fetchData(params)
-  }
+  const fetchData = useCallback(
+    async ({ params } = '') => {
+      try {
+        const response = await fetch(
+          params ? `${url}?_limit=${params._limit}` : url
+        )
+        const data = await response.json()
+        setIsLoading(false)
+        setData(data)
+      } catch (error) {
+        setIsLoading(false)
+        setError(error)
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [url]
+  )
 
   return {
     data,
     isLoading,
-    refetch,
+    refetch: fetchData,
     error,
   }
 }

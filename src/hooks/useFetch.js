@@ -1,43 +1,51 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-export function useFetch(url) {
+export function useFetch(url, options) {
   const [data, setData] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
 
+  const fetchData = useCallback(
+    async (options = {}) => {
+      try {
+        setIsLoading(true)
+        let response = null
+
+        if (options.params) {
+          const param = Object.entries(options.params)
+          response = await fetch(
+            `${url}?${param.map(([key, value]) => `${key}=${value}`).join('&')}`
+          )
+        } else {
+          response = await fetch(url)
+        }
+
+        const data = await response.json()
+        setIsLoading(false)
+        setData(data)
+      } catch (error) {
+        setIsLoading(false)
+        setError(error)
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [url]
+  )
+
   useEffect(() => {
-    fetchData()
+    fetchData(options)
     return () => {
       setError(null)
       setIsLoading(true)
       setData(null)
     }
-  }, [])
-
-  async function fetchData(params = '') {
-    try {
-      const response = await fetch(
-        params ? `${url}?_limit=${params._limit}` : url
-      )
-      const data = await response.json()
-      setIsLoading(false)
-      setData(data)
-    } catch (error) {
-      setIsLoading(false)
-      setError(error)
-    }
-  }
-
-  function refetch({ params }) {
-    setError(null)
-    setIsLoading(true)
-    fetchData(params)
-  }
+  }, [fetchData, options])
 
   return {
     data,
     isLoading,
-    refetch,
+    refetch: fetchData,
     error,
   }
 }

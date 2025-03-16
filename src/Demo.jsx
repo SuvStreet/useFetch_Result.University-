@@ -14,7 +14,8 @@ function Demo() {
           onClick={() =>
             refetch({
               params: {
-                _limit: 3,
+                _limit: 5,
+                userId: 1,
               },
             })
           }

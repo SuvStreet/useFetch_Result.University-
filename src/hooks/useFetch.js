@@ -30,7 +30,7 @@ export function useFetch(url, options) {
         setIsLoading(false)
       }
     },
-    [url]
+    [url, options]
   )
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export function useFetch(url, options) {
       setIsLoading(true)
       setData(null)
     }
-  }, [fetchData, options])
+  }, [fetchData])
 
   return {
     data,

@@ -1,25 +1,25 @@
 import { useCallback, useEffect, useState } from 'react'
 
-export function useFetch(url) {
+export function useFetch(url, options) {
   const [data, setData] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  useEffect(() => {
-    fetchData()
-    return () => {
-      setError(null)
-      setIsLoading(true)
-      setData(null)
-    }
-  }, [])
-
   const fetchData = useCallback(
-    async ({ params } = '') => {
+    async (options = {}) => {
       try {
-        const response = await fetch(
-          params ? `${url}?_limit=${params._limit}` : url
-        )
+        setIsLoading(true)
+        let response = null
+
+        if (options.params) {
+          const param = Object.entries(options.params)
+          response = await fetch(
+            `${url}?${param.map(([key, value]) => `${key}=${value}`).join('&')}`
+          )
+        } else {
+          response = await fetch(url)
+        }
+
         const data = await response.json()
         setIsLoading(false)
         setData(data)
@@ -32,6 +32,15 @@ export function useFetch(url) {
     },
     [url]
   )
+
+  useEffect(() => {
+    fetchData(options)
+    return () => {
+      setError(null)
+      setIsLoading(true)
+      setData(null)
+    }
+  }, [fetchData, options])
 
   return {
     data,
